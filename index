@@ -4,30 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Team Karma Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-bottom: 10px;
+        }
+
+        .team {
+            margin-bottom: 20px;
+        }
+
+        .player {
+            margin-bottom: 10px;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        button {
+            background: #007BFF;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <p>Made by @laufey, dm me if there’s any issues :)</p>
+    </div>
     <div class="container">
         <h1>Team Karma Calculator</h1>
         <form id="karmaForm">
             <div class="team">
-                <h2>Team A</h2>
+                <input type="text" id="teamAName" placeholder="Team A Name" required>
+                <button type="button" onclick="submitTeam('teamA')">Submit Team</button>
                 <div class="player" id="teamA">
                     <!-- Player inputs for Team A -->
                 </div>
-                <button type="button" onclick="addPlayer('teamA')">Add Player</button>
+                <button type="button" onclick="addPlayer('teamA')" id="addPlayerTeamA" style="display:none;">Add Player</button>
             </div>
             <div class="team">
-                <h2>Team B</h2>
+                <input type="text" id="teamBName" placeholder="Team B Name" required>
+                <button type="button" onclick="submitTeam('teamB')">Submit Team</button>
                 <div class="player" id="teamB">
                     <!-- Player inputs for Team B -->
                 </div>
-                <button type="button" onclick="addPlayer('teamB')">Add Player</button>
+                <button type="button" onclick="addPlayer('teamB')" id="addPlayerTeamB" style="display:none;">Add Player</button>
             </div>
             <button type="button" onclick="calculateKarma()">Calculate Karma</button>
         </form>
         <div id="result"></div>
+        <div id="summary"></div>
     </div>
-    <script src="scripts.js"></script>
+    <script>
+        function submitTeam(team) {
+            const teamNameInput = document.getElementById(team + 'Name');
+            const teamName = teamNameInput.value;
+            if (teamName.trim() === '') {
+                alert('Please enter a team name.');
+                return;
+            }
+            teamNameInput.disabled = true;
+            const submitButton = teamNameInput.nextElementSibling;
+            submitButton.style.display = 'none';
+            const addButton = document.getElementById('addPlayer' + capitalizeFirstLetter(team));
+            addButton.style.display = 'block';
+        }
+
+        function addPlayer(team) {
+            const teamDiv = document.getElementById(team);
+            const playerDiv = document.createElement('div');
+            playerDiv.className = 'player-input';
+            playerDiv.innerHTML = `
+                <input type="text" placeholder="Player Name" required>
+                <input type="number" placeholder="Karma" required>
+                <label>
+                    <input type="checkbox"> Captain
+                </label>
+            `;
+            teamDiv.appendChild(playerDiv);
+        }
+
+        function calculateKarma() {
+            const teamAName = document.getElementById('teamAName').value || 'Team A';
+            const teamBName = document.getElementById('teamBName').value || 'Team B';
+            const teamAPlayers = document.getElementById('teamA').getElementsByClassName('player-input');
+            const teamBPlayers = document.getElementById('teamB').getElementsByClassName('player-input');
+
+            const { totalKarma: teamAKarma, summary: teamASummary } = calculateTeamKarma(teamAPlayers, teamAName);
+            const { totalKarma: teamBKarma, summary: teamBSummary } = calculateTeamKarma(teamBPlayers, teamBName);
+
+            let resultText = `${teamAName} total karma: ${teamAKarma}<br>`;
+            resultText += `${teamBName} total karma: ${teamBKarma}<br>`;
+            if (teamAKarma > teamBKarma) {
+                resultText += `${teamAName} wins!`;
+            } else if (teamBKarma > teamAKarma) {
+                resultText += `${teamBName} wins!`;
+            } else {
+                resultText += "It's a tie!";
+            }
+
+            document.getElementById('result').innerHTML = resultText;
+            document.getElementById('summary').innerHTML = `<pre>${teamASummary}\n\n${teamBSummary}</pre>`;
+        }
+
+        function calculateTeamKarma(players, teamName) {
+            let totalKarma = 0;
+            let summary = `${teamName}:\n`;
+            for (let player of players) {
+                const inputs = player.getElementsByTagName('input');
+                const playerName = inputs[0].value || 'Unknown Player';
+                const karma = parseFloat(inputs[1].value) || 0; // Default to 0 if input is not a number
+                const isCaptain = inputs[2].checked;
+
+                const playerKarma = isCaptain ? karma * 1.5 : karma;
+                totalKarma += playerKarma;
+                summary += `@${playerName}${isCaptain ? ' (C)' : ''} - ${Math.round(playerKarma)}\n`;
+            }
+            summary += `Total: ${Math.round(totalKarma)}`;
+            return { totalKarma, summary };
+        }
+
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
 </body>
 </html>
