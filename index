@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Karma Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Team Karma Calculator</h1>
+        <form id="karmaForm">
+            <div class="team">
+                <h2>Team A</h2>
+                <div class="player" id="teamA">
+                    <!-- Player inputs for Team A -->
+                </div>
+                <button type="button" onclick="addPlayer('teamA')">Add Player</button>
+            </div>
+            <div class="team">
+                <h2>Team B</h2>
+                <div class="player" id="teamB">
+                    <!-- Player inputs for Team B -->
+                </div>
+                <button type="button" onclick="addPlayer('teamB')">Add Player</button>
+            </div>
+            <button type="button" onclick="calculateKarma()">Calculate Karma</button>
+        </form>
+        <div id="result"></div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

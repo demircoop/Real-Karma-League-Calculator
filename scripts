@@ -1,0 +1,48 @@
+let playerCountA = 0;
+let playerCountB = 0;
+
+function addPlayer(team) {
+    const teamDiv = document.getElementById(team);
+    const playerDiv = document.createElement('div');
+    playerDiv.className = 'player-input';
+    playerDiv.innerHTML = `
+        <input type="text" placeholder="Player Name" required>
+        <input type="number" placeholder="Karma" required>
+        <label>
+            <input type="checkbox"> Captain
+        </label>
+    `;
+    teamDiv.appendChild(playerDiv);
+}
+
+function calculateKarma() {
+    const teamAPlayers = document.getElementById('teamA').getElementsByClassName('player-input');
+    const teamBPlayers = document.getElementById('teamB').getElementsByClassName('player-input');
+
+    const teamAKarma = calculateTeamKarma(teamAPlayers);
+    const teamBKarma = calculateTeamKarma(teamBPlayers);
+
+    let resultText = `Team A total karma: ${teamAKarma}<br>`;
+    resultText += `Team B total karma: ${teamBKarma}<br>`;
+    if (teamAKarma > teamBKarma) {
+        resultText += "Team A wins!";
+    } else if (teamBKarma > teamAKarma) {
+        resultText += "Team B wins!";
+    } else {
+        resultText += "It's a tie!";
+    }
+
+    document.getElementById('result').innerHTML = resultText;
+}
+
+function calculateTeamKarma(players) {
+    let totalKarma = 0;
+    for (let player of players) {
+        const inputs = player.getElementsByTagName('input');
+        const karma = parseFloat(inputs[1].value);
+        const isCaptain = inputs[2].checked;
+
+        totalKarma += isCaptain ? karma * 1.5 : karma;
+    }
+    return totalKarma;
+}
